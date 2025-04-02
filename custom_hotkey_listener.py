@@ -33,7 +33,7 @@ class HotkeyListener:
                 value = KeyCode.from_char(str_shortcut)
             
             shortcut_list.append(value)
-        print(shortcut_list)
+        
         return shortcut_list
         
     def on_press(self, key):
