@@ -3,7 +3,9 @@
 
 ![Example using WhisperClip](assets/readme/example-of-usage.gif)
 
-WhisperClip simplifies your life by automatically transcribing audio recordings and saving the text directly to your clipboard. With just a click of a button, you can effortlessly convert spoken words into written text, ready to be pasted wherever you need it. This application harnesses the power of OpenAI's Whisper for free, making transcription more accessible and convenient. This is a fork from the original [repo](https://github.com/gustavostz/whisper-clip/tree/main) that aims to support Linux as an operating system.
+WhisperClip simplifies your life by automatically transcribing audio recordings and saving the text directly to your clipboard. With just a click of a button, you can effortlessly convert spoken words into written text, ready to be pasted wherever you need it. This application harnesses the power of OpenAI's Whisper for free, making transcription more accessible and convenient. This is a fork from the original [repo](https://github.com/gustavostz/whisper-clip/tree/main) that 
+* Adds support to Linux as an operating system.
+* Refactors the transcription engine from [Whisper](https://github.com/openai/whisper) to use [Faster-Whisper](https://github.com/SYSTRAN/faster-whisper), which uses [CTranslate2](https://github.com/OpenNMT/CTranslate2/) to speed up CPU inference.
 
 ## Table of Contents
 
