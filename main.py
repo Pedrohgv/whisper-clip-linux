@@ -1,12 +1,13 @@
 from dotenv import load_dotenv
 load_dotenv()
-import tkinter as tk
+from PySide6.QtWidgets import QApplication
 from audio_recorder import AudioRecorder
 import json
+import sys
 
 
 def main():
-    root = tk.Tk()
+    app = QApplication(sys.argv)
 
     # Load configurations from the config file
     with open('config.json', 'r') as config_file:
@@ -20,8 +21,9 @@ def main():
     }
     config = {**default_config, **config}
 
-    app = AudioRecorder(root, **config)
-    root.mainloop()
+    window = AudioRecorder(**config)
+    window.show()
+    sys.exit(app.exec())
 
 
 if __name__ == "__main__":

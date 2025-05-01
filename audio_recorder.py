@@ -1,5 +1,6 @@
-import tkinter as tk
-from tkinter import ttk
+from PySide6.QtWidgets import (QApplication, QMainWindow, QPushButton,
+                              QCheckBox, QVBoxLayout, QWidget)
+from PySide6.QtCore import Qt, Signal
 import pyperclip
 import sounddevice as sd
 import numpy as np
@@ -14,17 +15,17 @@ from custom_hotkey_listener import HotkeyListener
 from pystray import Icon, MenuItem, Menu
 from PIL import Image
 import platform
+import sys
 
 
-class AudioRecorder:
-    def __init__(self, master, model_name="medium.en", shortcut="alt+shift+r", notify_clipboard_saving=True):
+class AudioRecorder(QMainWindow):
+    def __init__(self, model_name="medium.en", shortcut="alt+shift+r", notify_clipboard_saving=True):
+        super().__init__()
         self.system_platform = platform.system()
         self.output_folder = "output"
-        self.master = master
-        self.master.title("WhisperClip")
-        self.master.geometry("200x100")
-        # self.master.iconbitmap('./assets/whisper_clip-centralized.ico')
-
+        self.setWindowTitle("WhisperClip")
+        self.resize(200, 100)
+        
         self.is_recording = False
         self.recordings = []
         self.transcription_queue = queue.Queue()
@@ -37,13 +38,23 @@ class AudioRecorder:
         self.model_loading_thread = None
         self.model_ready = threading.Event()
 
-        self.record_button = tk.Button(self.master, text="🎙", command=self.toggle_recording, font=("Arial", 24),
-                                       bg="white")
-        self.record_button.pack(expand=True)
+        # Create central widget and layout
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        layout = QVBoxLayout(central_widget)
 
-        self.save_to_clipboard = tk.BooleanVar(value=True)
-        self.clipboard_checkbox = tk.Checkbutton(self.master, text="Save to Clipboard", variable=self.save_to_clipboard)
-        self.clipboard_checkbox.pack()
+        # Record button
+        self.record_button = QPushButton("🎙")
+        self.record_button.setStyleSheet("font-size: 24px; background-color: white;")
+        self.record_button.clicked.connect(self.toggle_recording)
+        layout.addWidget(self.record_button, stretch=1)
+
+        # Clipboard checkbox
+        self.save_to_clipboard = True
+        self.clipboard_checkbox = QCheckBox("Save to Clipboard")
+        self.clipboard_checkbox.setChecked(True)
+        self.clipboard_checkbox.stateChanged.connect(self.on_clipboard_check)
+        layout.addWidget(self.clipboard_checkbox)
 
         self.transcription_thread = threading.Thread(target=self.process_transcriptions)
         self.transcription_thread.start()
@@ -52,8 +63,8 @@ class AudioRecorder:
         self.setup_global_shortcut()
         self.setup_system_tray()
 
-        # Stop all processes when the window is closed
-        self.master.protocol("WM_DELETE_WINDOW", self.on_close)
+    def on_clipboard_check(self, state):
+        self.save_to_clipboard = state == Qt.Checked
 
     def load_model_async(self):
         self.transcriber.load_model()
@@ -67,7 +78,7 @@ class AudioRecorder:
 
     def start_recording(self):
         self.is_recording = True
-        self.record_button.config(bg="red")
+        self.record_button.setStyleSheet("font-size: 24px; background-color: red;")
         
         # Start model loading in parallel
         self.model_ready.clear()
@@ -80,7 +91,7 @@ class AudioRecorder:
 
     def stop_recording(self):
         self.is_recording = False
-        self.record_button.config(bg="white")
+        self.record_button.setStyleSheet("font-size: 24px; background-color: white;")
         sd.stop()
         self.record_thread.join()
         
@@ -126,7 +137,7 @@ class AudioRecorder:
                 print(f"Transcription for {filename}:", transcription)
                 self.transcription_queue.task_done()
                 
-                if self.save_to_clipboard.get():
+                if self.save_to_clipboard:
                     pyperclip.copy(transcription)
                     if self.notify_clipboard_saving:
                         self.play_notification_sound()
@@ -138,8 +149,9 @@ class AudioRecorder:
             except queue.Empty:
                 continue
 
-    def on_close(self):
-        self.master.withdraw()  # Hide the window
+    def closeEvent(self, event):
+        self.hide()  # Hide the window instead of closing
+        event.ignore()
 
     def record_audio(self):
         with sd.InputStream(callback=self.audio_callback, channels=1):
@@ -161,7 +173,7 @@ class AudioRecorder:
 
     def setup_system_tray(self):
         # Load the icon image from a file
-        icon_image = Image.open('./assets/whisper_clip-centralized.png')
+        icon_image = Image.open('./assets/whisper_clip.png')
 
         # Define the menu items
         menu = Menu(
@@ -176,10 +188,10 @@ class AudioRecorder:
 
     def show_window(self):
         # Show the window again
-        self.master.deiconify()
+        self.show()
 
     def exit_application(self):
         self.keep_transcribing = False
         self.transcription_thread.join()
         self.icon.stop()
-        self.master.quit();
+        QApplication.quit()
