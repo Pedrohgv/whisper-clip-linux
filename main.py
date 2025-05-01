@@ -4,10 +4,20 @@ from PySide6.QtWidgets import QApplication
 from audio_recorder import AudioRecorder
 import json
 import sys
+import signal
+import psutil
+
+
+def handle_sigterm(signum, frame):
+    """Handle SIGTERM signal by quitting application"""
+    QApplication.quit()
 
 
 def main():
     app = QApplication(sys.argv)
+    
+    # Register signal handler for clean shutdown
+    signal.signal(signal.SIGTERM, handle_sigterm)
 
     # Load configurations from the config file
     with open('config.json', 'r') as config_file:
@@ -23,7 +33,13 @@ def main():
 
     window = AudioRecorder(**config)
     window.show()
-    sys.exit(app.exec())
+    
+    # Ensure process terminates completely
+    ret = app.exec()
+    process = psutil.Process()
+    for child in process.children(recursive=True):
+        child.kill()
+    sys.exit(ret)
 
 
 if __name__ == "__main__":

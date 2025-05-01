@@ -34,6 +34,7 @@ class AudioRecorder(QMainWindow):
         # Add thread management
         self.model_loading_thread = None
         self.model_ready = threading.Event()
+        self.record_thread = None
 
         # Create central widget and layout
         central_widget = QWidget()
@@ -152,6 +153,7 @@ class AudioRecorder(QMainWindow):
             self.hide()
             event.ignore()
         else:
+            self.cleanup()
             self.exit_application()
 
     def record_audio(self):
@@ -170,18 +172,21 @@ class AudioRecorder(QMainWindow):
 
     def setup_system_tray(self):
         self.tray_icon = QSystemTrayIcon(self)
-        self.tray_icon.setIcon(QIcon('./assets/whisper_clip.png'))
+        
+        # Load icon with absolute path
+        icon_path = os.path.join(os.path.dirname(__file__), 'assets/whisper_clip.png')
+        if os.path.exists(icon_path):
+            self.tray_icon.setIcon(QIcon(icon_path))
+        else:
+            print(f"Icon file not found at: {icon_path}")
+            self.tray_icon.setIcon(QApplication.windowIcon())
         
         # Create tray menu
         tray_menu = QMenu()
         
-        toggle_action = QAction("Toggle Recording", self)
-        toggle_action.triggered.connect(self.toggle_recording)
-        tray_menu.addAction(toggle_action)
-        
-        show_action = QAction("Show Window", self)
-        show_action.triggered.connect(self.show)
-        tray_menu.addAction(show_action)
+        self.toggle_window_action = QAction("Show/Hide", self)
+        self.toggle_window_action.triggered.connect(self.toggle_window_visibility)
+        tray_menu.addAction(self.toggle_window_action)
         
         exit_action = QAction("Exit", self)
         exit_action.triggered.connect(self.exit_application)
@@ -197,16 +202,50 @@ class AudioRecorder(QMainWindow):
         self.setWindowFlags(self.windowFlags() | Qt.WindowMinimizeButtonHint)
         
     def on_tray_icon_activated(self, reason):
-        if reason == QSystemTrayIcon.Trigger:  # Single click
-            self.show()
+        if reason == QSystemTrayIcon.DoubleClick:  # Double click
+            self.toggle_window_visibility()
 
-    def show_window(self):
-        # Show the window again
-        self.show()
+    def toggle_window_visibility(self):
+        if self.isVisible():
+            self.hide()
+            self.toggle_window_action.setText("Show")
+        else:
+            self.show()
+            self.toggle_window_action.setText("Hide")
+
+    def cleanup(self):
+        """Release all resources and clean up temporary files"""
+        # Stop any active recording
+        if self.is_recording:
+            self.stop_recording()
+        
+        # Release audio resources
+        sd.stop()
+        
+        # Clean up threads
+        self.keep_transcribing = False
+        if hasattr(self, 'transcription_thread') and self.transcription_thread.is_alive():
+            self.transcription_thread.join(timeout=1)
+        
+        if hasattr(self, 'model_loading_thread') and self.model_loading_thread and self.model_loading_thread.is_alive():
+            self.model_loading_thread.join(timeout=1)
+        
+        if hasattr(self, 'record_thread') and self.record_thread and self.record_thread.is_alive():
+            self.record_thread.join(timeout=1)
+        
+        # Unload model if loaded
+        if hasattr(self.transcriber, 'unload_model'):
+            self.transcriber.unload_model()
+        
+        # Clear any pending transcriptions
+        while not self.transcription_queue.empty():
+            try:
+                self.transcription_queue.get_nowait()
+            except queue.Empty:
+                break
 
     def exit_application(self):
-        self.keep_transcribing = False
-        self.transcription_thread.join()
+        self.cleanup()
         if hasattr(self, 'tray_icon'):
             self.tray_icon.hide()
         QApplication.quit()
