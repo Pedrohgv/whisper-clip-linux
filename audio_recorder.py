@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import (QApplication, QMainWindow, QPushButton,
-                              QCheckBox, QVBoxLayout, QWidget)
+                              QCheckBox, QVBoxLayout, QWidget, QSystemTrayIcon, QMenu)
 from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QAction, QIcon, QShortcut, QKeySequence
 import pyperclip
 import sounddevice as sd
 import numpy as np
@@ -10,10 +11,6 @@ import queue
 import time
 import os
 from whisper_client import WhisperClient
-import pynput.keyboard as keyboard
-from custom_hotkey_listener import HotkeyListener
-from pystray import Icon, MenuItem, Menu
-from PIL import Image
 import platform
 import sys
 
@@ -150,8 +147,12 @@ class AudioRecorder(QMainWindow):
                 continue
 
     def closeEvent(self, event):
-        self.hide()  # Hide the window instead of closing
-        event.ignore()
+        # Minimize to tray instead of closing
+        if self.tray_icon.isVisible():
+            self.hide()
+            event.ignore()
+        else:
+            self.exit_application()
 
     def record_audio(self):
         with sd.InputStream(callback=self.audio_callback, channels=1):
@@ -162,29 +163,42 @@ class AudioRecorder(QMainWindow):
         self.recordings.append(indata.copy())
 
     def setup_global_shortcut(self):
-        # Use the shortcut passed during initialization
-        # custom implementation for linux system
-        listener = HotkeyListener(self.shortcut, self.toggle_recording)
-        keyboard_listener = keyboard.Listener(
-            on_press=listener.on_press,
-            on_release=listener.on_release
-        )
-        keyboard_listener.start()
+        # Create Qt shortcut
+        key_sequence = QKeySequence(self.shortcut)
+        self.shortcut = QShortcut(key_sequence, self)
+        self.shortcut.activated.connect(self.toggle_recording)
 
     def setup_system_tray(self):
-        # Load the icon image from a file
-        icon_image = Image.open('./assets/whisper_clip.png')
-
-        # Define the menu items
-        menu = Menu(
-            MenuItem('Toggle Recording (' + self.shortcut + ')', self.toggle_recording),
-            MenuItem('Show Window', self.show_window, default=True, visible=False),
-            MenuItem('Exit', self.exit_application)
-        )
-
-        # Create and run the system tray icon
-        self.icon = Icon('WhisperClip', icon_image, 'WhisperClip', menu)
-        self.icon.run_detached()
+        self.tray_icon = QSystemTrayIcon(self)
+        self.tray_icon.setIcon(QIcon('./assets/whisper_clip.png'))
+        
+        # Create tray menu
+        tray_menu = QMenu()
+        
+        toggle_action = QAction("Toggle Recording", self)
+        toggle_action.triggered.connect(self.toggle_recording)
+        tray_menu.addAction(toggle_action)
+        
+        show_action = QAction("Show Window", self)
+        show_action.triggered.connect(self.show)
+        tray_menu.addAction(show_action)
+        
+        exit_action = QAction("Exit", self)
+        exit_action.triggered.connect(self.exit_application)
+        tray_menu.addAction(exit_action)
+        
+        self.tray_icon.setContextMenu(tray_menu)
+        self.tray_icon.show()
+        
+        # Connect tray icon click to show window
+        self.tray_icon.activated.connect(self.on_tray_icon_activated)
+        
+        # Enable minimize to tray
+        self.setWindowFlags(self.windowFlags() | Qt.WindowMinimizeButtonHint)
+        
+    def on_tray_icon_activated(self, reason):
+        if reason == QSystemTrayIcon.Trigger:  # Single click
+            self.show()
 
     def show_window(self):
         # Show the window again
@@ -193,5 +207,6 @@ class AudioRecorder(QMainWindow):
     def exit_application(self):
         self.keep_transcribing = False
         self.transcription_thread.join()
-        self.icon.stop()
+        if hasattr(self, 'tray_icon'):
+            self.tray_icon.hide()
         QApplication.quit()

@@ -19,9 +19,7 @@ packaging==24.2
 pillow==11.1.0
 protobuf==6.30.2
 pycparser==2.22
-pynput==1.8.1
 pyperclip==1.9.0
-pystray==0.19.5
 python-dotenv==1.1.0
 python-xlib==0.33
 PyYAML==6.0.2
