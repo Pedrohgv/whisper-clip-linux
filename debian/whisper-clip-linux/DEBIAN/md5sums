@@ -1,0 +1,17 @@
+3a39f538b1cb41449878deddb12d4595  lib/systemd/system/whisper-clip-linux.service
+54544ebe215f5756974fe0862a787914  usr/bin/whisper-clip-linux-launcher
+286c142dc821e069368ef15edd49a958  usr/lib/whisper-clip-linux/audio_recorder.py
+2be67613d71cfc7d803b4fb34f536161  usr/lib/whisper-clip-linux/config.json
+bce8f2930c974000f046f4295bd60ad9  usr/lib/whisper-clip-linux/custom_hotkey_listener.py
+5447d2b3f70d380a503a5874cd8bac61  usr/lib/whisper-clip-linux/main.py
+cf1c89f5eec40b72eabc2303057fc2ba  usr/lib/whisper-clip-linux/requirements.txt
+6cd5796a0476893f0d9c6867ba28071c  usr/lib/whisper-clip-linux/whisper_client.py
+8bbda57340474e83679f6a501b6c9a40  usr/share/applications/whisper-clip-linux.desktop
+9d3bc8d5d6234cefc6871653f38937b3  usr/share/doc/whisper-clip-linux/changelog.Debian.gz
+c04fdc8296e1829898a51f3f483df900  usr/share/glib-2.0/schemas/whisper-clip-linux.gschema.xml
+ff979e1947586e9aa78bd092bb1c2c2f  usr/share/python3/runtime.d/whisper-clip-linux.rtupdate
+a77d52b158f3a6b2b3901522d4834c01  usr/share/whisper-clip-linux/assets/readme/example-of-usage.gif
+7cf4aba6c64d624f31f2ebedb60df049  usr/share/whisper-clip-linux/assets/saved-on-clipboard-sound.wav
+d003e2e9918caba0a534e56edce65b2a  usr/share/whisper-clip-linux/assets/whisper_clip-centralized.png
+2bac653d8ed384646d6f467a9627257d  usr/share/whisper-clip-linux/assets/whisper_clip.ico
+877c0b34a31c4646f498fb85c6203b87  usr/share/whisper-clip-linux/assets/whisper_clip.png

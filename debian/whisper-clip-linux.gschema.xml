@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.whisper-clip-linux.shortcuts" path="/org/whisper-clip-linux/shortcuts/">
+    <key name="record-shortcut" type="s">
+      <default>'&lt;Alt&gt;&lt;Shift&gt;R'</default>
+      <summary>Keyboard shortcut to start/stop recording</summary>
+      <description>The keyboard combination used to trigger audio recording and transcription.</description>
+    </key>
+  </schema>
+</schemalist>

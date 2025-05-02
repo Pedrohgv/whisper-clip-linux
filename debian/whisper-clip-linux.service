@@ -1,0 +1,8 @@
+[Unit]
+Description=Whisper Clip Linux Background Service
+
+[Service]
+ExecStart=/usr/lib/whisper-clip-linux/venv/bin/python3 /usr/lib/whisper-clip-linux/main.py
+
+[Install]
+WantedBy=multi-user.target

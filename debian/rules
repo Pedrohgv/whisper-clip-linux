@@ -1,0 +1,20 @@
+#!/usr/bin/make -f
+
+# Export environment variables needed for some build systems.
+# export DH_VERBOSE = 1
+
+# Add here commands to configure the package.
+
+%:
+	dh $@ --with python3
+
+# Add here commands to clean up after the build process.
+# override_dh_auto_clean:
+#	dh_auto_clean
+#	rm -f debian/debhelper-build-stamp
+#	rm -f debian/*.substvars
+#	rm -f debian/files.*
+#	rm -fr debian/whisper-clip-linux/
+#	rm -fr debian/tmp/
+override_dh_virtualenv:
+	dh_virtualenv --python=/usr/bin/python3

@@ -1,0 +1,15 @@
+./main.py
+./audio_recorder.py
+./whisper_client.py
+./custom_hotkey_listener.py
+./config.json
+./requirements.txt
+./assets/readme
+./assets/saved-on-clipboard-sound.wav
+./assets/whisper_clip-centralized.png
+./assets/whisper_clip.ico
+./assets/whisper_clip.png
+./debian/whisper-clip-linux.desktop
+./debian/whisper-clip-linux.gschema.xml
+./debian/whisper-clip-linux.service
+./debian/whisper-clip-linux-launcher

@@ -1,0 +1,16 @@
+Source: whisper-clip-linux
+Maintainer: Your Name <your.email@example.com>
+Section: utils
+Priority: optional
+Build-Depends: debhelper-compat (=13), dh-python, python3-all, dh-virtualenv
+Standards-Version: 4.6.2
+Homepage: https://github.com/yourusername/whisper-clip-linux
+
+Package: whisper-clip-linux
+Architecture: any
+Depends: ${misc:Depends}, python3, python3-pip, python3-venv, libportaudio2, ${python3:Depends}
+Description: Whisper Clip Linux - Record audio, transcribe with Whisper, and copy to clipboard.
+ This application allows users to quickly record short audio snippets using a
+ keyboard shortcut, transcribe the audio using the Faster Whisper model,
+ and automatically copy the transcription to the system clipboard.
+ It includes a system tray icon for easy access and configuration.
