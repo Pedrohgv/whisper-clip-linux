@@ -1,0 +1,39 @@
+#!/bin/bash
+set -e
+
+APP_LIB_DIR="/usr/lib/whisper-clip-linux"
+APP_SHARE_DIR="/usr/share/whisper-clip-linux"
+DESKTOP_FILE="/usr/share/applications/whisper-clip-linux.desktop"
+SCHEMA_FILE="/usr/share/glib-2.0/schemas/whisper-clip-linux.gschema.xml"
+SCHEMA_DIR="/usr/share/glib-2.0/schemas"
+LAUNCHER="/usr/bin/whisper-clip-linux-launcher"
+
+case "$1" in
+    remove|upgrade|deconfigure)
+        echo "Removing whisper-clip-linux files..."
+        rm -rf "$APP_LIB_DIR"
+        rm -rf "$APP_SHARE_DIR"
+        rm -f "$DESKTOP_FILE"
+        rm -f "$SCHEMA_FILE"
+        rm -f "$LAUNCHER"
+
+        echo "Compiling GSettings schemas after removal..."
+         if [ -x "/usr/bin/glib-compile-schemas" ]; then
+            glib-compile-schemas "$SCHEMA_DIR"
+        else
+            echo "Warning: glib-compile-schemas not found. Schema compilation skipped." >&2
+        fi
+    ;;
+
+    failed-upgrade)
+    ;;
+
+    *)
+        echo "prerm called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+#DEBHELPER#
+
+exit 0

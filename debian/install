@@ -1,0 +1,19 @@
+# Core application files
+main.py usr/lib/whisper-clip-linux
+audio_recorder.py usr/lib/whisper-clip-linux
+whisper_client.py usr/lib/whisper-clip-linux
+custom_hotkey_listener.py usr/lib/whisper-clip-linux
+config.json usr/lib/whisper-clip-linux
+requirements.txt usr/lib/whisper-clip-linux
+
+# Assets
+assets/* usr/share/whisper-clip-linux/assets
+
+# Desktop entry and Schema
+debian/whisper-clip-linux.desktop usr/share/applications
+debian/whisper-clip-linux.gschema.xml usr/share/glib-2.0/schemas
+
+# Systemd service file
+debian/whisper-clip-linux.service lib/systemd/system
+# Launcher script (to be created)
+debian/whisper-clip-linux-launcher usr/bin

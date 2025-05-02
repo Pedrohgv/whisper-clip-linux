@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Whisper Clip Linux
+Comment=Record audio, transcribe, and copy to clipboard
+Exec=/usr/bin/whisper-clip-linux-launcher
+Icon=/usr/share/whisper-clip-linux/assets/whisper_clip.png
+Terminal=false
+Type=Application
+Categories=Utility;AudioVideo;Audio;
+Keywords=whisper;transcribe;audio;clipboard;record;

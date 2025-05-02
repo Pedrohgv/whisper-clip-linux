@@ -1,0 +1,7 @@
+#! /bin/sh
+set -e
+
+if [ "$1" = rtupdate ]; then
+	py3clean -p whisper-clip-linux /usr/lib/whisper-clip-linux
+	py3compile -p whisper-clip-linux  /usr/lib/whisper-clip-linux
+fi

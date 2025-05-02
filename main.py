@@ -6,7 +6,12 @@ import json
 import sys
 import signal
 import psutil
+import os  # Import the os module
 
+# Get the directory where the script is located
+script_dir = os.path.dirname(os.path.abspath(__file__))
+# Construct the absolute path to config.json
+config_path = os.path.join(script_dir, 'config.json')
 
 def handle_sigterm(signum, frame):
     """Handle SIGTERM signal by quitting application"""
@@ -15,13 +20,21 @@ def handle_sigterm(signum, frame):
 
 def main():
     app = QApplication(sys.argv)
-    
+
     # Register signal handler for clean shutdown
     signal.signal(signal.SIGTERM, handle_sigterm)
 
-    # Load configurations from the config file
-    with open('config.json', 'r') as config_file:
-        config = json.load(config_file)
+    # Load configurations from the config file using the absolute path
+    try:
+        with open(config_path, 'r') as config_file:
+            config = json.load(config_file)
+    except FileNotFoundError:
+        print(f"Error: Configuration file not found at {config_path}", file=sys.stderr)
+        sys.exit(1)
+    except json.JSONDecodeError:
+        print(f"Error: Could not decode JSON from configuration file at {config_path}", file=sys.stderr)
+        sys.exit(1)
+
 
     # Set default values for missing keys (if you want to change it, you must change the config.json file, not here)
     default_config = {
@@ -33,7 +46,7 @@ def main():
 
     window = AudioRecorder(**config)
     window.show()
-    
+
     # Ensure process terminates completely
     ret = app.exec()
     process = psutil.Process()
