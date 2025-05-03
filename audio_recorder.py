@@ -65,6 +65,7 @@ class AudioRecorder(QMainWindow):
         layout.addWidget(self.clipboard_checkbox)
 
         self.transcription_thread = threading.Thread(target=self.process_transcriptions)
+        self.transcription_thread.daemon = True
         self.transcription_thread.start()
 
         # Set up the global shortcut and system tray icon
@@ -91,10 +92,12 @@ class AudioRecorder(QMainWindow):
         # Start model loading in parallel
         self.model_ready.clear()
         self.model_loading_thread = threading.Thread(target=self.load_model_async)
+        self.model_loading_thread.daemon = True
         self.model_loading_thread.start()
 
         # Start recording immediately
         self.record_thread = threading.Thread(target=self.record_audio)
+        self.record_thread.daemon = True
         self.record_thread.start()
 
     def stop_recording(self):
@@ -193,9 +196,11 @@ class AudioRecorder(QMainWindow):
     def closeEvent(self, event):
         # Minimize to tray instead of closing
         if self.tray_icon.isVisible():
+            print("visible")
             self.hide()
             event.ignore()
         else:
+            print("not visible")
             self.cleanup()
             self.exit_application()
 
