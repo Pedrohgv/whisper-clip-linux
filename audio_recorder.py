@@ -196,11 +196,9 @@ class AudioRecorder(QMainWindow):
     def closeEvent(self, event):
         # Minimize to tray instead of closing
         if self.tray_icon.isVisible():
-            print("visible")
             self.hide()
             event.ignore()
         else:
-            print("not visible")
             self.cleanup()
             self.exit_application()
 
